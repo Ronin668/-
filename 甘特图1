@@ -1,0 +1,77 @@
+import pandas as pd
+import plotly.figure_factory as ff
+
+# 1. 准备数据
+# 根据文档内容构建数据列表，保持原有顺序
+data = [
+    {"Task": "学位课程与工作坊", "Start": "2025-09-03", "Finish": "2026-07-20", "Group": "课程学习"},
+    {"Task": "文献阅读与确定方向", "Start": "2025-09-03", "Finish": "2026-07-20", "Group": "课程学习"},
+    {"Task": "翻译实践与积累", "Start": "2026-07-20", "Finish": "2028-03-13", "Group": "专业实习"},
+    {"Task": "开题报告撰写", "Start": "2026-09-03", "Finish": "2026-12-02", "Group": "开题"},
+    {"Task": "开题答辩会", "Start": "2026-12-02", "Finish": "2026-12-03", "Group": "开题"},
+    {"Task": "修改与定稿", "Start": "2026-12-04", "Finish": "2026-12-07", "Group": "开题"},
+    {"Task": "文献补充阅读", "Start": "2026-12-09", "Finish": "2027-06-07", "Group": "开题"},
+    {"Task": "初稿写作", "Start": "2027-06-08", "Finish": "2027-10-16", "Group": "初稿"},
+    {"Task": "中期检查", "Start": "2027-10-18", "Finish": "2027-10-19", "Group": "初稿"},
+    {"Task": "完善初稿", "Start": "2027-10-21", "Finish": "2028-01-29", "Group": "初稿"},
+    {"Task": "初稿定稿", "Start": "2028-01-31", "Finish": "2028-03-01", "Group": "初稿"},
+    {"Task": "查重", "Start": "2028-03-02", "Finish": "2028-03-12", "Group": "查重"},
+    {"Task": "专业实践报告会", "Start": "2028-03-13", "Finish": "2028-04-12", "Group": "实习汇报"},
+    {"Task": "修改论文", "Start": "2028-03-13", "Finish": "2028-05-02", "Group": "定稿"},
+    {"Task": "提交定稿", "Start": "2028-05-04", "Finish": "2028-05-05", "Group": "定稿"},
+    {"Task": "评阅", "Start": "2028-05-06", "Finish": "2028-05-13", "Group": "评阅"},
+    {"Task": "答辩(一次)", "Start": "2028-05-15", "Finish": "2028-05-18", "Group": "答辩"},
+    {"Task": "修改", "Start": "2028-05-19", "Finish": "2028-05-25", "Group": "答辩"},
+    {"Task": "答辩(二次)", "Start": "2028-05-27", "Finish": "2028-05-27", "Group": "答辩"},
+    {"Task": "整理材料", "Start": "2028-05-26", "Finish": "2028-05-29", "Group": "整理材料"},
+    {"Task": "毕业典礼", "Start": "2028-05-30", "Finish": "2028-06-09", "Group": "毕业"},
+    {"Task": "教育部抽检", "Start": "2028-10-19", "Finish": "2028-10-29", "Group": "抽检"}
+]
+
+df = pd.DataFrame(data)
+
+# 2. 设置颜色映射 (根据任务组别自定义十六进制颜色)
+colors_map = {
+    "课程学习": "#4E79A7",  # 蓝色
+    "专业实习": "#F28E2B",  # 橙色
+    "开题": "#E15759",      # 红色
+    "初稿": "#76B7B2",      # 青绿色
+    "查重": "#59A14F",      # 绿色
+    "实习汇报": "#EDC948",  # 黄色
+    "定稿": "#B07AA1",      # 紫色
+    "评阅": "#FF9DA7",      # 粉色
+    "答辩": "#9C755F",      # 棕色
+    "整理材料": "#BAB0AC",  # 灰色
+    "毕业": "#D4A5A5",      # 淡红
+    "抽检": "#333333"       # 深灰
+}
+
+# 将组别映射为颜色列表，确保顺序与DataFrame一致
+colors = [colors_map[group] for group in df['Group']]
+
+# 3. 创建甘特图
+fig = ff.create_gantt(
+    df,
+    index_col='Group',          # 按组别分类颜色
+    colors=colors_map,          # 应用自定义颜色字典
+    title='张宇研究生学业规划节点甘特图',
+    show_colorbar=True,         # 显示颜色条（虽然这里是离散颜色，但保留布局完整性）
+    bar_width=0.8,              # 条形宽度
+    showgrid_x=True,            # 显示X轴网格
+    showgrid_y=True,            # 显示Y轴网格
+    group_tasks=True            # 将任务按组折叠/分组显示（可选，若希望扁平化可设为False）
+)
+
+# 4. 优化布局
+fig.update_layout(
+    xaxis_title="时间",
+    yaxis_title="任务",
+    height=800,                 # 设置高度以适应所有任务
+    width=1200,                 # 设置宽度
+    hovermode="y unified"       # 悬停显示模式
+)
+
+# 如果希望任务严格按列表顺序（不分组折叠），可以取消下面的注释并注释掉上面的 group_tasks=True
+# fig = ff.create_gantt(df, index_col='Group', colors=colors_map, title='张宇研究生学业规划节点甘特图', show_colorbar=False, bar_width=0.8, showgrid_x=True, showgrid_y=True, group_tasks=False)
+
+fig.show()
