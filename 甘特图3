@@ -1,0 +1,58 @@
+import pandas as pd
+import plotly.express as px
+
+# 1. 读取 Excel 文件
+# 假设 Excel 文件的第一行是大标题，真正的列名在第二行，因此使用 skiprows=1 跳过第一行
+# 如果您的 Excel 文件第一行直接是列名（如“序号”、“环节”、“内容”等），请将 skiprows=1 删除
+file_path = "E:\MTI\张宇研究生学业规划节点.xlsx"
+df = pd.read_excel(file_path, skiprows=1)
+
+# 清理可能存在的空行，确保关键列不为空
+df = df.dropna(subset=['内容', '开始日期', '完成日期'])
+
+# 2. 转换日期格式
+df['开始日期'] = pd.to_datetime(df['开始日期'])
+df['完成日期'] = pd.to_datetime(df['完成日期'])
+
+# 3. 提取文档原生顺序的任务列表，用于强制固定甘特图 Y 轴的任务顺序
+task_order = df['内容'].tolist()
+
+# 4. 自定义不重复的十六进制颜色列表
+# 确保颜色数量大于或等于您的任务数量，每项任务将按顺序分配这些颜色
+unique_hex_colors = [
+    "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#33FFF6",
+    "#F6FF33", "#8A33FF", "#FF8F33", "#33FF8A", "#FF3333",
+    "#33A1FF", "#A1FF33", "#FF33F6", "#33FFF0", "#F033FF",
+    "#FFB833", "#33FFB8", "#B833FF", "#FF338A", "#338AFF",
+    "#4A235A", "#154360", "#0E6251", "#7D6608", "#78281F",
+    "#E67E22", "#27AE60", "#8E44AD", "#2980B9", "#F1C40F"
+]
+
+# 5. 绘制甘特图
+fig = px.timeline(
+    df,
+    x_start="开始日期",
+    x_end="完成日期",
+    y="内容",
+    color="内容",          # 根据任务内容赋予不同颜色
+    title="张宇研究生学业规划甘特图",
+    hover_data=["环节", "状态", "持续时间"], # 鼠标悬停时显示附加信息
+    color_discrete_sequence=unique_hex_colors, # 应用自定义的十六进制颜色
+    category_orders={"内容": task_order}       # 强制按 Excel 文档中的顺序排列
+)
+
+# 6. 图表样式优化
+# 将 Y 轴反转，这样 Excel 排在前面的任务会显示在图表的上方，符合阅读习惯
+fig.update_yaxes(autorange="reversed")
+
+# 设置图表的布局、坐标轴标题等
+fig.update_layout(
+    xaxis_title="日期",
+    yaxis_title="任务内容",
+    showlegend=False,  # 隐藏图例（因为 Y 轴已经有任务名称了，隐藏图例更美观）
+    height=600 + len(df) * 20, # 根据任务行数动态自适应图表高度
+    title_x=0.5 # 标题居中
+)
+
+# 显示图表
+fig.show()
