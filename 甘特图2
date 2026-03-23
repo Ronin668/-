@@ -1,0 +1,66 @@
+import pandas as pd
+import plotly.figure_factory as ff
+
+# 1.数据准备
+# 根据文档内容构建数据列表
+data = [
+    {"Task": "1. 学位课程与工作坊", "Start": "2025-09-03", "Finish": "2026-07-20"},
+    {"Task": "2. 文献阅读与确定方向", "Start": "2025-09-03", "Finish": "2026-07-20"},
+    {"Task": "3. 翻译实践与积累", "Start": "2026-07-20", "Finish": "2028-03-13"},
+    {"Task": "4. 开题报告撰写", "Start": "2026-09-03", "Finish": "2026-12-02"},
+    {"Task": "5. 开题答辩会", "Start": "2026-12-02", "Finish": "2026-12-03"},
+    {"Task": "6. 修改与定稿", "Start": "2026-12-04", "Finish": "2026-12-07"},
+    {"Task": "7. 文献补充阅读", "Start": "2026-12-09", "Finish": "2027-06-07"},
+    {"Task": "8. 初稿写作", "Start": "2027-06-08", "Finish": "2027-10-16"},
+    {"Task": "9. 中期检查", "Start": "2027-10-18", "Finish": "2027-10-19"},
+    {"Task": "10. 完善初稿", "Start": "2027-10-21", "Finish": "2028-01-29"},
+    {"Task": "11. 初稿定稿", "Start": "2028-01-31", "Finish": "2028-03-01"},
+    {"Task": "12. 查重", "Start": "2028-03-02", "Finish": "2028-03-12"},
+    {"Task": "13. 专业实践报告会", "Start": "2028-03-13", "Finish": "2028-04-12"},
+    {"Task": "14. 修改论文", "Start": "2028-03-13", "Finish": "2028-05-02"},
+    {"Task": "15. 提交定稿", "Start": "2028-05-04", "Finish": "2028-05-05"},
+    {"Task": "16. 评阅", "Start": "2028-05-06", "Finish": "2028-05-13"},
+    {"Task": "17. 答辩(一次)", "Start": "2028-05-15", "Finish": "2028-05-18"},
+    {"Task": "18. 修改", "Start": "2028-05-19", "Finish": "2028-05-25"},
+    {"Task": "19. 答辩(二次)", "Start": "2028-05-27", "Finish": "2028-05-27"},
+    {"Task": "20. 整理材料", "Start": "2028-05-26", "Finish": "2028-05-29"},
+    {"Task": "21. 毕业典礼", "Start": "2028-05-30", "Finish": "2028-06-09"},
+    {"Task": "22. 教育部抽检", "Start": "2028-10-19", "Finish": "2028-10-29"},
+]
+# 转换为 DataFrame
+df = pd.DataFrame(data)
+
+# 确保日期格式正确
+df['Start'] = pd.to_datetime(df['Start'])
+df['Finish'] = pd.to_datetime(df['Finish'])
+
+# 2. 设置颜色
+# 为22项任务生成唯一的十六进制颜色码
+colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98FB98',
+    '#DDA0DD', '#F0E68C', '#87CEFA', '#FF7F50', '#20B2AA',
+    '#778899', '#BDB76B', '#FF4500', '#00CED1', '#9932CC',
+    '#8FBC8F', '#D2691E', '#5F9EA0', '#DA70D6', '#CD5C5C',
+    '#6495ED', '#FFE4C4'
+]
+
+# 3. 创建甘特图
+fig = ff.create_gantt(
+    df,
+    index_col='Task', # 使用任务名称作为索引列（用于区分颜色和标签）
+    colors=colors, # 应用自定义颜色列表
+    title='张宇研究生学业规划节点甘特图',
+    bar_width=0.8, # 条形宽度
+    showgrid_x=True, # 显示X轴网格
+    showgrid_y=True # 显示Y轴网格
+)
+
+# 4. 优化布局
+fig.update_layout(
+    xaxis_title='时间',
+    yaxis_title='任务环节',
+    height=800,
+    width=1200
+)
+# 5. 显示图表
+fig.show()
